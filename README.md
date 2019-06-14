@@ -1,7 +1,7 @@
 # H-k-stacking
 
 This repository contains C programs to perform H-k stacking of receiver functions (RF) to estimate crustal thickness and Vp/Vs ratio as in Zhu and Kanamori (2000), doi:10.1029/1999jb900322.
-The program hkstacking.c converts a single time-domain RF to a H-k-domain RF.
+The program hkstacking.c converts a single time-domain RF to an H-k-domain RF.
 The program hk_sum.c performs stacking and normalization of multiple H-k-domain RF, and outputs a file containing H, Vp/Vs, and Amplitude which can be easily plotted.
 
 Hkstacking.c relies on the SAC library to read sac files and header variables. Be sure to check the SAC manual (https://ds.iris.edu/files/sac-manual/) before trying to compile. Ray parameter must be already set in the sac header.

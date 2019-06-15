@@ -8,8 +8,8 @@
  * 
  * Arguments:
  * program [RF file] [output file] [minimum H] [maximum H] [minimum
- * kappa] [maximum kappa] [RF sample rate] [P wave velocity] [weight 1]
- * [weight 2] [weight 3]
+ * kappa] [maximum kappa] [P wave velocity] [weight 1] [weight 2] 
+ * [weight 3]
  * 
  * Additional parameters can be set below as constants.
  * 
@@ -25,8 +25,10 @@
 #define MAX 2048
 /* Seconds before time 0 in RF */
 #define SEC 10
+/* Data sampling rate in Hz */
+#define FREQ 10
 /* Number of iterations */
-#define STEP 101
+#define STEP 100
 /* Variable containing ray parameter in SAC header */
 #define RAYP "USER8"
 
@@ -35,15 +37,15 @@ int main(int argc, char **argv)
 	float array[MAX], beg, del, p, hmin, hmax, kmin, kmax, vp, vs, 
 	kappa, tps, tppps, tppss, w1, w2, w3, si, sn, vpterm,
 	vsterm, deltah, deltak;
-	int freq, nlen, nerr, mx = MAX, start, n, m, dtps, dtppps, dtppss;
+	int nlen, nerr, mx = MAX, start, n, m, dtps, dtppps, dtppss;
 	char file[150], output[150];
 	FILE *fout;
 	/* Define 3D array that will contain the H-k RF */
 	float h[STEP], k[STEP], s[STEP][STEP];
   
-	if(argc != 12)
+	if(argc != 11)
 	{
-		printf("Usage: hkstacking file file_out hmin hmax kmin kmax freq vp w1 w2 w3");
+		printf("Usage: hkstacking file file_out hmin hmax kmin kmax vp w1 w2 w3");
 		exit(0);	
 	}
 
@@ -59,21 +61,19 @@ int main(int argc, char **argv)
 	kmin = atof(argv[5]);
 	/* Maximum kappa */
 	kmax = atof(argv[6]);
-	/* Sampling rate (Hz) */
-	freq = atoi(argv[7]);
 	/* P wave velocity */
-	vp = atof(argv[8]);
+	vp = atof(argv[7]);
 	/* Weight 1 */
-	w1 = atof(argv[9]);
+	w1 = atof(argv[8]);
 	/* Weight 2 */
-	w2 = atof(argv[10]);
+	w2 = atof(argv[9]);
 	/* Weight 3 */
-	w3 = atof(argv[11]);
+	w3 = atof(argv[10]);
 	/* Define H and kappa increase */
 	deltah = (hmax-hmin)/(STEP-1);
 	deltak = (kmax-kmin)/(STEP-1);
 	/* Define starting point of array */
-	start = SEC*freq;
+	start = SEC*FREQ;
   
 	/* Call rsac1 (SAC library) to read sac file. Returns the array
 	 * variable. nlen: array length; beg: beggining time; del: delta
@@ -117,9 +117,9 @@ int main(int argc, char **argv)
 			tppss = 2*h[n]*vsterm;
 			
 			/* Arrival times to data points */
-			int dtps = start+tps*freq;
-			int dtppps = start+tppps*freq;
-			int dtppss = start+tppss*freq;
+			int dtps = start+tps*FREQ;
+			int dtppps = start+tppps*FREQ;
+			int dtppss = start+tppss*FREQ;
 			
 			/* Stack */
 			s[n][m] = w1*array[dtps]+w2*array[dtppps]-w3*array[dtppss];

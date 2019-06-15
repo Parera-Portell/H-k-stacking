@@ -19,7 +19,7 @@
  * Define number of iteration steps (must be the same than that in 
  * hkstacking.c.) 
  */
-#define STEP 101
+#define STEP 100
 
 int main(int argc, char **argv)
 {
@@ -95,3 +95,4 @@ int main(int argc, char **argv)
 
 	return 0;
 }
+

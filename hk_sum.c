@@ -31,7 +31,7 @@ int main(int argc, char **argv)
   
 	if(argc < 3)
 	{
-		printf("Usage: program [output txt] [H-k RF 1] [H-k RF 2] ... [H-k RF N]");
+		printf("Usage: program [output] [H-k RF 1] [H-k RF 2] ... [H-k RF N]");
 		exit(0);	
 	}
 	
@@ -40,10 +40,12 @@ int main(int argc, char **argv)
 	strcpy(outfile, argv[1]);
 	
 	/* Iteration through stack files passed as args */
+	printf("Reading H-k RF number:\n");
 	for(n=2; n<argc; n++)
 	{
 		strcpy(file, argv[n]);
 		fout = fopen(file, "r");
+		printf("%d...", n-1);
 		m = 0;
 		w = 3;
 		while(m<STEP*STEP && w==3)
@@ -60,9 +62,10 @@ int main(int argc, char **argv)
 	}
 	
 	/* Stacking */
+	printf("\nReading done. Stacking...\n");
 	for(m=0; m<STEP*STEP; m++)
 	{
-		sum[m] = 0;
+		sum[m] = 0.0;
 		for(n=0; n<argc-2; n++)
 		{
 			sum[m] = sum[m] + s[m][n];
@@ -90,7 +93,7 @@ int main(int argc, char **argv)
 		si = (sum[n]+sqrtf(powf(min,2.0)))/(max+sqrtf(powf(min,2.0)));
 		fprintf(fsum, "%2.2f,%1.3f,%1.6f\n", h[n], k[n], si);
 	}
-	
+	printf("H-k stacking done!\n");
 	fclose(fsum);
 
 	return 0;

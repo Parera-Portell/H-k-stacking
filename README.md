@@ -4,7 +4,7 @@ This repository contains C programs to perform H-k stacking of receiver function
 The program hkstacking.c converts a single time-domain RF to an H-k-domain RF.
 The program hk_sum.c performs stacking and normalization of multiple H-k-domain RF, and outputs a file containing H, Vp/Vs, and Amplitude which can be easily plotted.
 The program bootstrap.c computes standard error and correlation of the H-k stack via the bootstrap method.
-The python script hk_plot.py calculates the standard error ellipse of the H-k stack and outputs a png figure.
+The python script hk_plot.py calculates the standard error ellipse, plots the H-k stack, and outputs a png figure.
 
 Hkstacking.c relies on the SAC library to read sac files and header variables. Be sure to check the SAC manual (https://ds.iris.edu/files/sac-manual/) before trying to compile. Ray parameter must be already set in the sac header.
 

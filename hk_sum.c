@@ -15,23 +15,19 @@
 #include <stdlib.h>
 #include <math.h>
 
-/* 
- * Define number of iteration steps (must be the same than that in 
- * hkstacking.c.) 
- */
-#define STEP 100
+/* Maximum array size */
+#define MAX 50000
 
 int main(int argc, char **argv)
 {
-	int n, m, w;
-	float min, max, h[STEP*STEP], k[STEP*STEP], s[STEP*STEP][argc-2],
-	sum[STEP*STEP], hh, kk, ss, si;
+	int n, m, w, size;
+	float min, max, h[MAX], k[MAX], s[MAX], hh, kk, ss, si, esth, estk;
 	char file[150], outfile[150];
 	FILE *fout, *fsum;
   
 	if(argc < 3)
 	{
-		printf("Usage: program [output] [H-k RF 1] [H-k RF 2] ... [H-k RF N]");
+		printf("Usage: program [output] [H-k RF 1] ... [H-k RF N]");
 		exit(0);	
 	}
 	
@@ -40,62 +36,57 @@ int main(int argc, char **argv)
 	strcpy(outfile, argv[1]);
 	
 	/* Iteration through stack files passed as args */
-	printf("Reading H-k RF number:\n");
+	printf("\nReading H-k RF number:\n");
 	for(n=2; n<argc; n++)
 	{
 		strcpy(file, argv[n]);
 		fout = fopen(file, "r");
 		printf("%d...", n-1);
-		m = 0;
+		size = 0;
 		w = 3;
-		while(m<STEP*STEP && w==3)
+		while(w==3)
 		{
 			/* Read file and store values */
 			w = fscanf(fout, "%f,%f,%f", &hh, &kk, &ss);
 			
-			/* Add stack values m to file vector n */
-			h[m] = hh;
-			k[m] = kk;
-			s[m][n-2] = ss;
-			m++;
-		}
-	}
-	
-	/* Stacking */
-	printf("\nReading done. Stacking...\n");
-	for(m=0; m<STEP*STEP; m++)
-	{
-		sum[m] = 0.0;
-		for(n=0; n<argc-2; n++)
-		{
-			sum[m] = sum[m] + s[m][n];
-		}
-		
-		/* Find if the stack value is maximum */
-		if (sum[m] > max)
-		{
-			max = sum[m];
-		}
-		
-		/* Find if the stack value is minimum */
-		if (sum[m] < min)
-		{
-			min = sum[m];
+			if (n == 2)
+			{
+				s[size] = 0;
+			}
+			
+			/* Stacking */
+			h[size] = hh;
+			k[size] = kk;
+			s[size] += ss;
+			
+			/* Find if the stack value is maximum */
+			if (s[size] > max)
+			{
+				max = s[size];
+			}
+			
+			/* Find if the stack value is minimum */
+			if (s[size] < min)
+			{
+				min = s[size];
+			}
+			
+			size++;
 		}
 	}
 	
 	fclose(fout);
+	size--;
 	
 	/* Normalize stack and write to output file */
 	fsum = fopen(outfile, "w");
-	for(n=0; n<STEP*STEP; n++)
+	for(n=0; n<size; n++)
 	{
-		si = (sum[n]+sqrtf(powf(min,2.0)))/(max+sqrtf(powf(min,2.0)));
-		fprintf(fsum, "%2.2f,%1.3f,%1.6f\n", h[n], k[n], si);
+		si = (s[n]+sqrtf(powf(min,2.0)))/(max+sqrtf(powf(min,2.0)));
+		fprintf(fsum, "%2.2f,%1.3f,%1.5f\n", h[n], k[n], si);
 	}
-	printf("H-k stacking done!\n");
+	printf("\nH-k stacking done!\n");
 	fclose(fsum);
 
 	return 0;
 }
-

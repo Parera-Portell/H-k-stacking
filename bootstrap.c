@@ -6,7 +6,7 @@
  * This program performs bootstrap on H-k stacks.
  * 
  * Arguments:
- * program [output file] [H-k RF 1] [H-k RF 2] ... [H-k RF N]
+ * program [out error] [out iter] [H-k RF 1] [H-k RF 2] ... [H-k RF N]
  * 
  */
 
@@ -20,10 +20,10 @@
 #define M 4294967296
 #define A 22695477
 #define C 1
-/* Number of steps in previous stacking (hk_sum.c and hkstacking.c) */
-#define STEP 100
 /* Number of bootstrap iterations */
 #define NITER 100
+/* Maximum array size */
+#define MAX 50000
 /* Initialize seed */
 long long seed = 1;
 
@@ -36,6 +36,7 @@ int rnd(int max)
 	if(max < 1)
 	{
 		printf("Error, MAX value is too low");
+		exit(0);
 	}
 		
 	/* Linear mixed congruential generator */
@@ -51,16 +52,15 @@ int rnd(int max)
 /*-----------------------------Bootstrap------------------------------*/
 int main(int argc, char **argv)
 {
-	int n, m, w, r, z, niter;
-	float max, h[STEP*STEP], k[STEP*STEP], s[STEP*STEP][argc-2],
-	sum[STEP*STEP], hh, kk, ss, avh, avk, hsum, ksum, covh, covk, covhk, 
-	hstd, kstd, corr, mh[NITER], mk[NITER];
-	char file[150], outfile[150];
-	FILE *fout, *fcov;
+	int n, m, w, r, z, niter, size;
+	float max, h[MAX], k[MAX], s[MAX], sum[MAX], hh, kk, ss, avh, avk, 
+	hsum, ksum, varh, vark, covhk, hstd, kstd, corr, mh[NITER], mk[NITER];
+	char file[150], outfile[150], outiter[150];
+	FILE *fout, *fcov, *fiter;
   
-	if(argc < 3)
+	if(argc < 4)
 	{
-		printf("Usage: program [output] [H-k RF 1] ... [H-k RF N]");
+		printf("Usage: program [out error] [out iter] [H-k RF 1] ...");
 		exit(0);	
 	}
 	
@@ -71,86 +71,86 @@ int main(int argc, char **argv)
 	}
 	
 	/* Begin bootstrap iteration */
-	printf("Starting Bootstrap. Iteration number:\n");
+	printf("\nStarting Bootstrap. Iteration number:\n");
 	for(z=0; z<NITER; z++)
 	{
 		/* Iterate through random stack files passed as args */
-		printf("%d...", z+1);
+		printf("%d,", z+1);
 		max = -2000.0;
-		for(n=2; n<argc; n++)
+		for(n=3; n<argc; n++)
 		{
-			/* Call rnd to return random int between 2 to N */
-			r = rnd(argc-2)+2;
+			/* Call rnd to return random integer identifier */
+			r = rnd(argc-3)+3;
 			/* Open file number r */
 			strcpy(file, argv[r]);
 			fout = fopen(file, "r");
-			m = 0;
+			size = 0;
 			w = 3;
-			while(m<STEP*STEP && w==3)
+			while(w==3)
 			{
 				/* Read file and store values */
 				w = fscanf(fout, "%f,%f,%f", &hh, &kk, &ss);
 				
-				/* Add stack values m to file vector n */
-				h[m] = hh;
-				k[m] = kk;
-				s[m][n-2] = ss;
-				m++;
-			}
-			fclose(fout);
-		}
-		
-		/* Stacking */
-		for(m=0; m<STEP*STEP; m++)
-		{
-			sum[m] = 0.0;
-			for(n=0; n<argc-2; n++)
-			{
-				sum[m] = sum[m] + s[m][n];
+				if (n == 3)
+				{
+					s[size] = 0;
+				}
+				
+				/* Stacking */
+				h[size] = hh;
+				k[size] = kk;
+				s[size] += ss;
+				
+				/* Find if the stack value is maximum */
+				if (s[size] > max)
+				{
+					max = s[size];
+					mh[z] = h[size];
+					mk[z] = k[size];
+				}
+
+				size++;
 			}
 			
-			/* Find if the stack amplitude is maximum. If true, save H 
-			 * and kappa */
-			if (sum[m] > max)
-			{
-				max = sum[m];
-				mh[z] = h[m];
-				mk[z] = k[m];
-			}
+			fclose(fout);
 		}
-		printf("%f, %f\n", mh[z], mk[z]);
+
+		printf("%f,%f\n", mh[z], mk[z]);
 	}
 
 	/* Obtain average H (avh) and k (avk) over niter iterations */
 	hsum = 0.0;
 	ksum = 0.0;
+	strcpy(outiter, argv[2]);
+	fiter = fopen(outiter, "w");
 	for(z=0; z<NITER; z++)
 	{
 		hsum = hsum + mh[z];
 		ksum = ksum + mk[z];
+		fprintf(fiter, "%f,%f\n", mh[z], mk[z]);
 	}
 	avh = hsum/NITER;
 	avk = ksum/NITER;
 	printf("\nAverage: %f, %f\n", avh, avk);
 	
 	/* Compute covariance matrix */
-	covh = 0.0;
-	covk = 0.0;
+	varh = 0.0;
+	vark = 0.0;
 	covhk = 0.0;
 	for(z=0; z<NITER; z++)
 	{
-		covh = covh+((mh[z]-avh)*(mh[z]-avh));
-		covk = covk+((mk[z]-avk)*(mk[z]-avk));
+		varh = varh+((mh[z]-avh)*(mh[z]-avh));
+		vark = vark+((mk[z]-avk)*(mk[z]-avk));
 		covhk = covhk+((mh[z]-avh)*(mk[z]-avk));
 	}
 	
-	covh = (float)covh/(NITER-1);
-	covk = (float)covk/(NITER-1);
+	varh = (float)varh/(NITER-1);
+	vark = (float)vark/(NITER-1);
 	covhk = (float)covhk/(NITER-1);
 	
 	/* Compute standard error */
-	hstd = sqrtf(covh);
-	kstd = sqrtf(covk);
+	hstd = sqrtf(varh);
+	kstd = sqrtf(vark);
 	
 	/* Compute correlation */
 	corr = covhk/(kstd*hstd);
@@ -164,4 +164,3 @@ int main(int argc, char **argv)
 	
 	return 0;
 }
-

@@ -27,21 +27,21 @@
 #define SEC 10
 /* Data sampling rate in Hz */
 #define FREQ 10
-/* Number of iterations */
-#define STEP 100
+/* Resolution of H-k grid */
+#define HSTEP 0.1
+#define KSTEP 0.01
 /* Variable containing ray parameter in SAC header */
 #define RAYP "USER8"
 
 int main(int argc, char **argv)
 {
 	float array[MAX], beg, del, p, hmin, hmax, kmin, kmax, vp, vs, 
-	kappa, tps, tppps, tppss, w1, w2, w3, si, sn, vpterm,
-	vsterm, deltah, deltak;
-	int nlen, nerr, mx = MAX, start, n, m, dtps, dtppps, dtppss;
+	kappa, tps, tppps, tppss, w1, w2, w3, si, sn, vpterm, vsterm,
+	h, k, s;
+	int nlen, nerr, mx = MAX, start, n, m, dtps, dtppps, dtppss, hpts,
+	kpts;
 	char file[150], output[150];
 	FILE *fout;
-	/* Define 3D array that will contain the H-k RF */
-	float h[STEP], k[STEP], s[STEP][STEP];
   
 	if(argc != 11)
 	{
@@ -69,11 +69,12 @@ int main(int argc, char **argv)
 	w2 = atof(argv[9]);
 	/* Weight 3 */
 	w3 = atof(argv[10]);
-	/* Define H and kappa increase */
-	deltah = (hmax-hmin)/(STEP-1);
-	deltak = (kmax-kmin)/(STEP-1);
 	/* Define starting point of array */
 	start = SEC*FREQ;
+	/* Calculate number of grid cells. The additional 1.1 accounts for
+	 * the first cell plus the possible float innacuracy. */
+	hpts = ((hmax-hmin)/HSTEP)+1.1;
+	kpts = ((kmax-kmin)/KSTEP)+1.1;
   
 	/* Call rsac1 (SAC library) to read sac file. Returns the array
 	 * variable. nlen: array length; beg: beggining time; del: delta
@@ -99,42 +100,38 @@ int main(int argc, char **argv)
 		exit(nerr) ;
 	}
 	
+	fout = fopen(output, "w");
+	
 	/* Begin iteration */
-	for(n=0; n<STEP; n++)
+	for(n=0; n<hpts; n++)
 	{
-		h[n] = hmin+n*deltah;
-		for(m=0; m<STEP; m++)
+		h = hmin+n*HSTEP;
+		for(m=0; m<kpts; m++)
 		{
 			/* Calculation of Vs */
-			k[m] = kmin+m*deltak;
-			vs = vp/k[m];
+			k = kmin+m*KSTEP;
+			vs = vp/k;
 			
 			/* Predicted arrival times */
 			vsterm = sqrtf(powf(vs,-2.0)-powf(p,2.0));
 			vpterm = sqrtf(powf(vp,-2.0)-powf(p,2.0));
-			tps = h[n]*(vsterm-vpterm);
-			tppps = h[n]*(vsterm+vpterm);
-			tppss = 2*h[n]*vsterm;
+			tps = h*(vsterm-vpterm);
+			tppps = h*(vsterm+vpterm);
+			tppss = 2*h*vsterm;
 			
 			/* Arrival times to data points */
-			int dtps = start+tps*FREQ;
-			int dtppps = start+tppps*FREQ;
-			int dtppss = start+tppss*FREQ;
+			dtps = (int)start+tps*FREQ;
+			dtppps = (int)start+tppps*FREQ;
+			dtppss = (int)start+tppss*FREQ;
 			
-			/* Stack */
-			s[n][m] = w1*array[dtps]+w2*array[dtppps]-w3*array[dtppss];
-		}
-	}	
-	
-	/* Write results to file */
-	fout = fopen(output, "w");
-	for(n=0; n<STEP; n++)
-	{
-		for(m=0; m<STEP; m++)
-		{
-			fprintf(fout, "%2.2f,%1.3f,%1.6f\n", h[n], k[m], s[n][m]);
+			/* Conversion to H-k */
+			s = w1*array[dtps]+w2*array[dtppps]-w3*array[dtppss];
+			
+			/* Write results to file */
+			fprintf(fout, "%2.2f,%1.3f,%1.5f\n", h, k, s);
 		}
 	}
-	fclose(fout);;
+
+	fclose(fout);
 	return 0;
 }

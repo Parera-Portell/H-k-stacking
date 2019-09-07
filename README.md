@@ -11,7 +11,7 @@ Hkstacking.c relies on the SAC library to read sac files and header variables. B
 Arguments for hkstacking:
   program [RF file] [output file] [minimum H] [maximum H] [minimum kappa] [maximum kappa] [P wave velocity] [weight1] [weight2] [weight3]
 
-** Additional parameters (MAX length of data array, SEC seconds before time 0 in RF, FREQ sample rate, STEP number of iterations, and RAYP header variable containing ray parameter) should be defined in hkstacking.c as constants. **
+** Additional parameters: MAX (length of data array), SEC (seconds before time 0 in the RF), FREQ (sample rate), HSTEP & KSTEP (resolution of each variable), and RAYP (header variable containing ray parameter). Those are defined in hkstacking.c as constants. **
 
 Arguments for hk_sum:
   program [output file] [H-k RF 1] [H-k RF 2] ... [H-k RF N]

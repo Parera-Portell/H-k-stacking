@@ -52,9 +52,9 @@ int rnd(int max)
 /*-----------------------------Bootstrap------------------------------*/
 int main(int argc, char **argv)
 {
-	int n, m, w, r, z, niter, size;
-	float max, h[MAX], k[MAX], s[MAX], sum[MAX], hh, kk, ss, avh, avk, 
-	hsum, ksum, varh, vark, covhk, hstd, kstd, corr, mh[NITER], mk[NITER];
+	int n, m, w, r, z, niter;
+	float max, h, k, s[MAX], hh, kk, ss, avh, avk, hsum, ksum, varh, 
+	vark, covhk, hstd, kstd, corr, mh[NITER], mk[NITER];
 	char file[150], outfile[150], outiter[150];
 	FILE *fout, *fcov, *fiter;
   
@@ -84,32 +84,30 @@ int main(int argc, char **argv)
 			/* Open file number r */
 			strcpy(file, argv[r]);
 			fout = fopen(file, "r");
-			size = 0;
+			m = 0;
 			w = 3;
 			while(w==3)
 			{
 				/* Read file and store values */
-				w = fscanf(fout, "%f,%f,%f", &hh, &kk, &ss);
+				w = fscanf(fout, "%f,%f,%f", &h, &k, &ss);
 				
 				if (n == 3)
 				{
-					s[size] = 0;
+					s[m] = 0;
 				}
 				
 				/* Stacking */
-				h[size] = hh;
-				k[size] = kk;
-				s[size] += ss;
+				s[m] += ss;
 				
 				/* Find if the stack value is maximum */
-				if (s[size] > max)
+				if (s[m] > max)
 				{
-					max = s[size];
-					mh[z] = h[size];
-					mk[z] = k[size];
+					max = s[m];
+					mh[z] = h;
+					mk[z] = k;
 				}
 
-				size++;
+				m++;
 			}
 			
 			fclose(fout);

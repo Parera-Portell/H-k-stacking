@@ -53,8 +53,8 @@ int rnd(int max)
 int main(int argc, char **argv)
 {
 	int n, m, w, r, z, niter;
-	float max, h, k, s[MAX], hh, kk, ss, avh, avk, hsum, ksum, varh, 
-	vark, covhk, hstd, kstd, corr, mh[NITER], mk[NITER];
+	float max, h, k, s[MAX], ss, avh, avk, hsum, ksum, varh, vark, 
+	covhk, hstd, kstd, corr, mh[NITER], mk[NITER];
 	char file[150], outfile[150], outiter[150];
 	FILE *fout, *fcov, *fiter;
   

@@ -23,10 +23,6 @@
 
 /* Maximum length of the data array */
 #define MAX 2048
-/* Seconds before time 0 in RF */
-#define SEC 10
-/* Data sampling rate in Hz */
-#define FREQ 10
 /* Resolution of H-k grid */
 #define HSTEP 0.1
 #define KSTEP 0.01
@@ -69,8 +65,6 @@ int main(int argc, char **argv)
 	w2 = atof(argv[9]);
 	/* Weight 3 */
 	w3 = atof(argv[10]);
-	/* Define starting point of array */
-	start = SEC*FREQ;
 	/* Calculate number of grid cells. The additional 1.1 accounts for
 	 * the first cell plus the possible float innacuracy. */
 	hpts = ((hmax-hmin)/HSTEP)+1.1;
@@ -90,8 +84,10 @@ int main(int argc, char **argv)
 		exit (nerr);
 	}
 	
+	printf("begtime, %f", beg);
+	
 	/* Call getfhv (SAC library) to get ray parameter p from header */
-	getfhv(RAYP, &p , &nerr , strlen(RAYP));
+	getfhv(RAYP, &p, &nerr, strlen(RAYP));
 	
 	/* Check the error status (0=success) */
 	if (nerr != 0) 
@@ -99,6 +95,9 @@ int main(int argc, char **argv)
 		printf("Cannot access header\n");
 		exit(nerr) ;
 	}
+	
+	/* Define data point of direct P arrival */
+	start = abs(beg/del);
 	
 	fout = fopen(output, "w");
 	
@@ -120,9 +119,9 @@ int main(int argc, char **argv)
 			tppss = 2*h*vsterm;
 			
 			/* Arrival times to data points */
-			dtps = (int)start+tps*FREQ;
-			dtppps = (int)start+tppps*FREQ;
-			dtppss = (int)start+tppss*FREQ;
+			dtps = (int)start+tps/del;
+			dtppps = (int)start+tppps/del;
+			dtppss = (int)start+tppss/del;
 			
 			/* Conversion to H-k */
 			s = w1*array[dtps]+w2*array[dtppps]-w3*array[dtppss];

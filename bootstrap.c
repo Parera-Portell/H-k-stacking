@@ -142,9 +142,9 @@ int main(int argc, char **argv)
 		covhk = covhk+((mh[z]-avh)*(mk[z]-avk));
 	}
 	
-	varh = (float)varh/(NITER-1);
-	vark = (float)vark/(NITER-1);
-	covhk = (float)covhk/(NITER-1);
+	varh = varh/(NITER-1);
+	vark = vark/(NITER-1);
+	covhk = covhk/(NITER-1);
 	
 	/* Compute standard error */
 	hstd = sqrtf(varh);

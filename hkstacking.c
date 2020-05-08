@@ -22,7 +22,7 @@
 #include <sacio.h>
 
 /* Maximum length of the data array */
-#define MAX 2048
+#define MAX 10000
 /* Resolution of H-k grid */
 #define HSTEP 0.1
 #define KSTEP 0.01
@@ -34,14 +34,14 @@ int main(int argc, char **argv)
 	float array[MAX], beg, del, p, hmin, hmax, kmin, kmax, vp, vs, 
 	kappa, tps, tppps, tppss, w1, w2, w3, si, sn, vpterm, vsterm,
 	h, k, s;
-	int nlen, nerr, mx = MAX, start, n, m, dtps, dtppps, dtppss, hpts,
+	int nlen, nerr, mx=MAX, start, n, m, dtps, dtppps, dtppss, hpts,
 	kpts;
 	char file[150], output[150];
 	FILE *fout;
   
 	if(argc != 11)
 	{
-		printf("Usage: hkstacking file file_out hmin hmax kmin kmax vp w1 w2 w3");
+		printf("hkstacking rf file_out hmin hmax kmin kmax vp w1 w2 w3");
 		exit(0);	
 	}
 
@@ -65,26 +65,24 @@ int main(int argc, char **argv)
 	w2 = atof(argv[9]);
 	/* Weight 3 */
 	w3 = atof(argv[10]);
-	/* Calculate number of grid cells. The additional 1.1 accounts for
-	 * the first cell plus the possible float innacuracy. */
-	hpts = ((hmax-hmin)/HSTEP)+1.1;
-	kpts = ((kmax-kmin)/KSTEP)+1.1;
+	/* Calculate number of grid cells. */
+	hpts = round((hmax-hmin)/HSTEP)+1;
+	kpts = round((kmax-kmin)/KSTEP)+1;
   
-	/* Call rsac1 (SAC library) to read sac file. Returns the array
+	/* Call rsac1 (sacio library) to read sac file. Returns the array
 	 * variable. nlen: array length; beg: beggining time; del: delta
 	 * or time sampling; mx: MAX; nerr: error return flag; strlen(file):
-	 * length of file path.
+	 * length of file path. All variables are passed as references either
+     * arrays or using &varible to pass reference to variable.
 	 */
 	rsac1(file, array, &nlen, &beg, &del, &mx, &nerr, strlen(file));
 
 	/* Check the error status (0=success) */
 	if (nerr != 0) 
 	{
-		printf("Error reading in SAC file: %s\n", file);
+		printf("Error reading SAC file: %s\n", file);
 		exit (nerr);
 	}
-	
-	printf("begtime, %f", beg);
 	
 	/* Call getfhv (SAC library) to get ray parameter p from header */
 	getfhv(RAYP, &p, &nerr, strlen(RAYP));
@@ -119,9 +117,9 @@ int main(int argc, char **argv)
 			tppss = 2*h*vsterm;
 			
 			/* Arrival times to data points */
-			dtps = (int)start+tps/del;
-			dtppps = (int)start+tppps/del;
-			dtppss = (int)start+tppss/del;
+			dtps = round(start+tps/del);
+			dtppps = round(start+tppps/del);
+			dtppss = round(start+tppss/del);
 			
 			/* Conversion to H-k */
 			s = w1*array[dtps]+w2*array[dtppps]-w3*array[dtppss];

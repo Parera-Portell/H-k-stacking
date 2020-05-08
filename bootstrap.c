@@ -71,11 +71,11 @@ int main(int argc, char **argv)
 	}
 	
 	/* Begin bootstrap iteration */
-	printf("\nStarting Bootstrap. Iteration number:\n");
+	printf("\nStarting Bootstrap:\n");
 	for(z=0; z<NITER; z++)
 	{
 		/* Iterate through random stack files passed as args */
-		printf("%d,", z+1);
+		printf("%d\t", z+1);
 		max = -2000.0;
 		for(n=3; n<argc; n++)
 		{
@@ -113,7 +113,7 @@ int main(int argc, char **argv)
 			fclose(fout);
 		}
 
-		printf("%f,%f\n", mh[z], mk[z]);
+		printf("%.1f\t%.2f\n", mh[z], mk[z]);
 	}
 
 	/* Obtain average H (avh) and k (avk) over niter iterations */
@@ -125,11 +125,11 @@ int main(int argc, char **argv)
 	{
 		hsum = hsum + mh[z];
 		ksum = ksum + mk[z];
-		fprintf(fiter, "%f,%f\n", mh[z], mk[z]);
+		fprintf(fiter, "%.1f,%.2f\n", mh[z], mk[z]);
 	}
 	avh = hsum/NITER;
 	avk = ksum/NITER;
-	printf("\nAverage: %f, %f\n", avh, avk);
+	printf("\nAverage: %.3f, %.3f\n", avh, avk);
 	
 	/* Compute covariance matrix */
 	varh = 0.0;
@@ -156,8 +156,8 @@ int main(int argc, char **argv)
 	/* Write results to file */
 	strcpy(outfile, argv[1]);
 	fcov = fopen(outfile, "w");
-	fprintf(fcov, "Hstd,Kstd,CORR\n%f,%f,%f\n", hstd, kstd, corr);
-	printf("Hstd, Kstd, CORR: %f, %f, %f\n", hstd, kstd, corr);
+	fprintf(fcov, "Hstd,Kstd,CORR\n%.3f,%.3f,%.3f\n", hstd, kstd, corr);
+	printf("Hstd, Kstd, CORR: %.3f, %.3f, %.3f\n", hstd, kstd, corr);
 	fclose(fcov);
 	
 	return 0;

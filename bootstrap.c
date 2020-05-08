@@ -27,7 +27,7 @@
 /* Initialize seed */
 long long seed = 1;
 
-/*-----------Pseudo-random number generator function [0, max]---------*/
+/*----------Pseudo-random integer generator function [0, max]---------*/
 int rnd(int max)
 {
 	int out, n;
@@ -52,7 +52,7 @@ int rnd(int max)
 /*-----------------------------Bootstrap------------------------------*/
 int main(int argc, char **argv)
 {
-	int n, m, w, r, z, niter;
+	int n, m, w, r, z;
 	float max, h, k, s[MAX], ss, avh, avk, hsum, ksum, varh, vark, 
 	covhk, hstd, kstd, corr, mh[NITER], mk[NITER];
 	char file[150], outfile[150], outiter[150];

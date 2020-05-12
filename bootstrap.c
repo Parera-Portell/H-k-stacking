@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 		/* Iterate through random stack files passed as args */
 		printf("%d\t", z+1);
 		max = -2000.0;
-		for(n=2; n<argc; n++)
+		for(n=0; n<argc-2; n++)
 		{
 			/* Call rnd to return random integer identifier */
 			r = rnd(argc-2)+2;
@@ -91,7 +91,7 @@ int main(int argc, char **argv)
 				/* Read file and store values */
 				w = fscanf(fout, "%f,%f,%f", &h, &k, &ss);
 				
-				if (n == 3)
+				if (n == 0)
 				{
 					s[m] = 0;
 				}

@@ -19,8 +19,5 @@ Arguments for hk_sum:
 Arguments for bootstrap:
   program [output file] [H-k RF 1] [H-k RF 2] ... [H-k RF N]
   
-Arguments for hk_plot.py:
-  python3 hk_plot.py [in file] [out plot] [Hmin] [Hmax] [kmin] [kmax] [bootstrap]
-  
-All programs are short and simple, easily controlled through a bash script to do batch processing and plotting.
+Intended to be controlled through a bash script to do batch processing and plotting.
  

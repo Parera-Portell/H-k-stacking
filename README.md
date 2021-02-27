@@ -29,5 +29,5 @@ ARGUMENTS
     
     KSTEP (resolution of Vp/Vs)
     
-    RAYP (SAC header variable containing ray parameter)
+    RAYP (SAC header variable containing the ray parameter)
    

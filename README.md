@@ -8,9 +8,11 @@ This repository contains software to perform H-k stacking of receiver functions 
 
 -bootstrap.c computes standard error and correlation of the H-k stack via the bootstrap method.
 
+
+
 REQUIREMENTS
 
--SAC library. Check the SAC manual (https://ds.iris.edu/files/sac-manual/) before compiling.
+    -SAC library. Check the SAC manual (https://ds.iris.edu/files/sac-manual/) before compiling.
 
 ARGUMENTS
 

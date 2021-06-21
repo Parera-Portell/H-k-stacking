@@ -23,7 +23,7 @@ ARGUMENTS
     bootstrap [output file] [H-k RF 1] [H-k RF 2] ... [H-k RF n]
 
   
-  ******* Additional parameters to be set in  hkstacking.c as constants *******
+  ******* Additional parameters to be set in  time_to_hk.c as constants *******
   
     MAX (maximum length of data)
     

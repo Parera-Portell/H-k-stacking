@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 	int n, m, w, r, z;
 	float max, h, k, s[MAX], ss, avh, avk, hsum, ksum, varh, vark, 
 	covhk, hstd, kstd, corr, mh[NITER], mk[NITER];
-	char file[150], outfile[150];
+	char file[500], outfile[500];
 	FILE *fout, *fcov;
   
 	if(argc < 3)

@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 {
 	int n, m, w, size;
 	float min, max, h[MAX], k[MAX], s[MAX], hh, kk, ss, si, esth, estk;
-	char file[150], outfile[150];
+	char file[500], outfile[500];
 	FILE *fout, *fsum;
   
 	if(argc < 3)

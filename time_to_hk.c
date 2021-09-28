@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 	h, k, s;
 	int nlen, nerr, mx=MAX, start, n, m, dtps, dtppps, dtppss, hpts,
 	kpts;
-	char file[150], output[150];
+	char file[500], output[500];
 	FILE *fout;
   
 	if(argc != 11)
